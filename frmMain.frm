@@ -156,6 +156,17 @@ Private Sub Form_Load()
     Set Speaker = CreateObject("SAPI.SpVoice")
     Speaker.Volume = 100
     Speaker.Rate = -0.9
+    
+    
+    Call ReadXLS
+    
+    Me.Caption = "Ëæ»ú³éºÅ"
+    Frame1.Visible = True
+    ImgLoading.Visible = False
+    Me.Picture = LoadPicture()
+End Sub
+
+Sub ReadMDB()
     Set DA = New Connection
     DA.CursorLocation = adUseClient
     DA.Open "PROVIDER=Microsoft.Jet.OLEDB.4.0;Data Source=" & App.Path & "\StudentName.MDB;User ID=admin; Password=; Jet OLEDB:Database Password=3.14"
@@ -174,12 +185,29 @@ Private Sub Form_Load()
         NA.MoveNext
     Loop
     On Error GoTo 0
-    Me.Caption = "Ëæ»ú³éºÅ"
-    Frame1.Visible = True
-    ImgLoading.Visible = False
-    Me.Picture = LoadPicture()
 End Sub
 
+Sub ReadXLS()
+    Set xlApp = CreateObject("Excel.Application")
+    Set xlBook = xlApp.Workbooks.Open(App.Path & "\StudentName.xlsx")
+    xlApp.Visible = True
+    Set xlSheet = xlBook.Worksheets("Names")
+    Text = " "
+    Do Until Text = ""
+        ReDim Preserve AllNA(2, Names + 1)
+        AllNA(1, UBound(AllNA, 2)) = xlApp.Cells(Names + 1, 1)
+        AllNA(2, UBound(AllNA, 2)) = xlApp.Cells(Names + 1, 2)
+        If AllNA(2, UBound(AllNA, 2)) = "" Then AllNA(2, UBound(AllNA, 2)) = AllNA(1, UBound(AllNA, 2))
+        Text = AllNA(1, UBound(AllNA, 2))
+        Debug.Print AllNA(1, UBound(AllNA, 2)), AllNA(2, UBound(AllNA, 2))
+        Names = Names + 1
+    Loop
+    ReDim Preserve AllNA(2, UBound(AllNA, 2) - 1)
+    Names = Names - 1
+    xlBook.Close (True)
+    xlApp.Quit
+    Set xlApp = Nothing
+End Sub
 
 Public Sub Form_Unload(Cancel As Integer)
     
