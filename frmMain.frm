@@ -140,19 +140,19 @@ Private Sub Command1_Click()
     Rnda = Rnda - Int(Rnda)
     Rnda = Rnd + Rnda
     Rnda = Rnda - Int(Rnda)
-    lblName.Caption = AllNA(Int(Rnda * Names + 1))
-    Speaker.Speak "请" & lblName.Caption & "同学答题。", 1
+    RndNum = Int(Rnda * Names + 1)
+    lblName.Caption = AllNA(1, RndNum)
+    Speaker.Speak "请" & AllNA(2, RndNum) & "同学答题。", 1
 End Sub
 
 Private Sub Form_Load()
     
-    ReDim AllNA(0)
+    ReDim AllNA(2, 0)
     Me.Visible = True
     Me.Caption = "Loading"
     DoEvents
     SetWindowPos Me.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     Randomize
-    'hHook = SetWindowsHookEx(WH_MOUSE_LL, AddressOf MouseHookProc, App.hInstance, 0)
     Set Speaker = CreateObject("SAPI.SpVoice")
     Speaker.Volume = 100
     Speaker.Rate = -0.9
@@ -163,28 +163,26 @@ Private Sub Form_Load()
     NA.Open "select * from CLASS", DA, adOpenStatic, adLockOptimistic
     NA.MoveFirst
     Do While Not NA.EOF
-        ReDim Preserve AllNA(Names + 1)
-        AllNA(UBound(AllNA, 1)) = NA("姓名")
+        ReDim Preserve AllNA(2, Names + 1)
+        AllNA(1, UBound(AllNA, 2)) = NA("姓名")
+        AllNA(2, UBound(AllNA, 2)) = NA("姓名")
+        On Error Resume Next
+        If NA("读音") <> "" Then
+            AllNA(2, UBound(AllNA, 2)) = NA("读音")
+        End If
         Names = Names + 1
         NA.MoveNext
     Loop
+    On Error GoTo 0
     Me.Caption = "随机抽号"
     Frame1.Visible = True
     ImgLoading.Visible = False
     Me.Picture = LoadPicture()
 End Sub
 
-Private Sub Picture1_Click()
-
-End Sub
-
-Private Sub Timer1_Timer()
-    ImgLoading.Picture = LoadPicture(App.Path & "\Rotate" & CStr(LoadingNum Mod 7 + 1) & ".ico")
-    LoadingNum = LoadingNum + 1
-End Sub
 
 Public Sub Form_Unload(Cancel As Integer)
-    'UnhookWindowsHookEx hHook
+    
 End Sub
 
 Public Sub lblName_Click()
