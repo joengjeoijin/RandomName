@@ -128,6 +128,11 @@ Private Const SWP_NOSIZE& = &H1
 ' 保持窗口大小
 Private Const SWP_NOMOVE& = &H2
 ' 保持窗口位置
+Rem 禁止本窗体拥有输入焦点的常数
+Private Const HWND_NOTOPMOST = -2
+Private Const WS_DISABLED = &H8000000
+'Private Const GWL_EXSTYLE = (-20)
+Private Const GWL_STYLE = (-16)
 
 
 Private Sub Command1_Click()
@@ -152,13 +157,14 @@ Private Sub Form_Load()
     Me.Caption = "Loading"
     DoEvents
     SetWindowPos Me.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+    SetWindowLong Me.hwnd, GWL_EXSTYLE, GetWindowLong(Me.hwnd, GWL_EXSTYLE) Or WS_DISABLED
     Randomize
     Set Speaker = CreateObject("SAPI.SpVoice")
     Speaker.Volume = 100
     Speaker.Rate = -0.9
     
     
-    Call ReadXLS
+    Call ReadMDB
     
     Me.Caption = "随机抽号"
     Frame1.Visible = True
